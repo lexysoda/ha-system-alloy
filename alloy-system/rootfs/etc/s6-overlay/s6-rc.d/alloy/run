@@ -1,0 +1,7 @@
+#!/usr/bin/with-contenv bashio
+bashio::log.info "Starting Grafana Alloy..."
+
+exec /usr/bin/alloy run \
+    --server.http.listen-addr=127.0.0.1:12345 \
+    --storage.path=/data/alloy \
+    /data/alloy/conf.d

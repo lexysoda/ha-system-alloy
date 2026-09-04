@@ -1,0 +1,41 @@
+declare "stack" {
+  argument "stack_name" {}
+  argument "token" {}
+
+  remote.http "config" {
+    url = "https://grafana.com/api/instances/" + argument.stack_name.value
+    client {
+      bearer_token = argument.token.value
+    }
+    poll_frequency = "24h"
+  }
+
+  prometheus.remote_write "default" {
+    endpoint {
+      url = encoding.from_json(remote.http.config.content)["hmInstancePromUrl"] + "/api/prom/push"
+
+      basic_auth {
+        username = encoding.from_json(remote.http.config.content)["hmInstancePromId"]
+        password = argument.token.value
+      }
+    }
+  }
+
+  loki.write "default" {
+    endpoint {
+      url = encoding.from_json(remote.http.config.content)["hlInstanceUrl"] + "/loki/api/v1/push"
+
+      basic_auth {
+        username = encoding.from_json(remote.http.config.content)["hlInstanceId"]
+        password = argument.token.value
+      }
+    }
+  }
+
+  export "metrics" {
+    value = prometheus.remote_write.default.receiver
+  }
+  export "logs" {
+    value = loki.write.default.receiver
+  }
+}

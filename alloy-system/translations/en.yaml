@@ -1,0 +1,19 @@
+configuration:
+  stack_name:
+    name: "Grafana Cloud Stack Name"
+    description: "The slug / stack name of your Grafana Cloud instance."
+  access_token:
+    name: "Grafana Cloud Access Token"
+    description: "Your Grafana Cloud access token with write permissions for metrics and logs."
+  instance_name:
+    name: "Instance Name"
+    description: "The 'instance' label applied to all exported metrics and logs (defaults to 'homeassistant')."
+  scrape_interval:
+    name: "Scrape Interval"
+    description: "Prometheus scraping frequency for host node metrics (e.g. 30s, 60s)."
+  min_log_level:
+    name: "Global Minimum Log Level"
+    description: "Default filter threshold. Logs below this level will be dropped."
+  alloy_log_level:
+    name: "Alloy Internal Log Level"
+    description: "Logging verbosity of the Alloy telemetry collector process itself (not the collected system logs)."

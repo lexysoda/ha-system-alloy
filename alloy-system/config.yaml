@@ -1,0 +1,35 @@
+name: "HA System Alloy"
+version: "0.1.0"
+slug: "alloy-system"
+description: "Directly push host node metrics and systemd journal logs to Grafana Cloud with zero open ports."
+url: "https://github.com/lexysoda/ha-system-alloy"
+arch:
+  - amd64
+  - aarch64
+init: false
+startup: services
+boot: manual
+
+journald: true
+apparmor: false
+
+map:
+  - addon_config:rw
+
+ports: {}
+
+options:
+  stack_name: ""
+  access_token: ""
+  instance_name: "homeassistant"
+  scrape_interval: "60s"
+  min_log_level: "info"
+  alloy_log_level: "info"
+
+schema:
+  stack_name: "str"
+  access_token: "password"
+  instance_name: "str?"
+  scrape_interval: "str?"
+  min_log_level: "list(debug|info|notice|warning|error|critical)?"
+  alloy_log_level: "list(debug|info|warn|error)?"

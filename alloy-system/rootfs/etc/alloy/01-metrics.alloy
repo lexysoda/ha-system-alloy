@@ -1,0 +1,23 @@
+prometheus.exporter.unix "host" {
+  procfs_path = "/proc"
+  sysfs_path  = "/sys"
+}
+
+prometheus.scrape "node" {
+  targets         = prometheus.exporter.unix.host.targets
+  forward_to      = [prometheus.relabel.node.receiver]
+  scrape_interval = sys.env("SCRAPE_INTERVAL")
+}
+
+prometheus.relabel "node" {
+  forward_to = [grafana_cloud.stack.receivers.metrics]
+
+  rule {
+    target_label = "instance"
+    replacement  = sys.env("INSTANCE_NAME")
+  }
+  rule {
+    target_label = "job"
+    replacement  = "homeassistant-node"
+  }
+}

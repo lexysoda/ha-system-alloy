@@ -1,0 +1,12 @@
+import.file "grafana_cloud" {
+  filename = "/etc/alloy/modules/grafana_cloud.alloy"
+}
+
+grafana_cloud.stack "receivers" {
+  stack_name = sys.env("STACK_NAME")
+  token      = sys.env("ACCESS_TOKEN")
+}
+
+logging {
+  level = sys.env("ALLOY_LOG_LEVEL")
+}

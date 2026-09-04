@@ -1,0 +1,46 @@
+loki.process "custom" {
+  forward_to = [loki.process.journal.receiver]
+
+  stage.match {
+    selector = "{container_name=~\"(app|addon)_.*_zigbee2mqtt\"}"
+    stage.regex {
+      expression = "(?i)^\\[[^\\]]+\\]\\s+(?P<parsed_level>debug|info|warn|warning|error):"
+    }
+    stage.template {
+      source   = "parsed_level"
+      template = "{{ if eq (ToLower .Value) \"warn\" }}warning{{ else }}{{ ToLower .Value }}{{ end }}"
+    }
+    stage.labels {
+      values = { level = "parsed_level" }
+    }
+  }
+
+  stage.match {
+    selector = "{container_name=~\"(app|addon)_.*_configurator\"}"
+    stage.regex {
+      expression = "^(?P<parsed_level>DEBUG|INFO|WARNING|ERROR):"
+    }
+    stage.template {
+      source   = "parsed_level"
+      template = "{{ ToLower .Value }}"
+    }
+    stage.labels {
+      values = { level = "parsed_level" }
+    }
+  }
+
+  stage.match {
+    selector = "{container_name=~\"(app|addon)_.*_(configurator|mosquitto|zigbee2mqtt)\", level=~\"debug|info|notice\"}"
+    action   = "drop"
+  }
+
+  stage.match {
+    selector = "{container_name=~\"(app|addon)_.*\", level=~\"debug\"}"
+    action   = "drop"
+  }
+
+  stage.match {
+    selector = "{container_name=~\"hassio_supervisor|hassio_dns|homeassistant\", level=~\"debug\"}"
+    action   = "drop"
+  }
+}

@@ -1,0 +1,106 @@
+loki.source.journal "host_journal" {
+  path          = sys.env("JOURNAL_PATH")
+  forward_to    = [loki.process.journal_base.receiver]
+  relabel_rules = loki.relabel.journal.rules
+  labels        = {
+    job      = "systemd-journal",
+    instance = sys.env("INSTANCE_NAME"),
+  }
+}
+
+loki.relabel "journal" {
+  forward_to = []
+
+  rule {
+    action        = "drop"
+    source_labels = ["__journal__transport"]
+    regex         = "audit"
+  }
+
+  rule {
+    source_labels = ["__journal__systemd_unit"]
+    target_label  = "unit"
+  }
+  rule {
+    source_labels = ["__journal__hostname"]
+    target_label  = "hostname"
+  }
+  rule {
+    source_labels = ["__journal_syslog_identifier"]
+    target_label  = "syslog_identifier"
+  }
+  rule {
+    source_labels = ["__journal__transport"]
+    target_label  = "transport"
+  }
+  rule {
+    source_labels = ["__journal_container_name"]
+    target_label  = "container_name"
+  }
+  rule {
+    source_labels = ["__journal_priority_keyword"]
+    target_label  = "level"
+  }
+}
+
+loki.process "journal_base" {
+  stage.match {
+    selector = "{container_name=\"\"}"
+    action   = "keep"
+
+    stage.drop {
+      expression = "^\\s*$"
+    }
+  }
+
+  stage.match {
+    selector = "{container_name=~\"(app|addon)_.*_alloy-system\"}"
+    action   = "keep"
+
+    stage.regex {
+      expression = "(?i)level=(?:\"?)(?P<parsed_level>[a-zA-Z]+)(?:\"?)"
+    }
+
+    stage.template {
+      source   = "parsed_level"
+      template = "{{ if eq (ToLower .Value) \"warn\" }}warning{{ else if eq (ToLower .Value) \"err\" }}error{{ else if eq (ToLower .Value) \"crit\" }}critical{{ else }}{{ ToLower .Value }}{{ end }}"
+    }
+
+    stage.labels {
+      values = {
+        level = "parsed_level",
+      }
+    }
+  }
+
+  stage.match {
+    selector = "{container_name=~\"hassio_supervisor|hassio_dns|homeassistant\"}"
+    action   = "keep"
+
+    stage.regex {
+      expression = "(?i)(?:^\\d{4}-\\d{2}-\\d{2}[ T]\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?\\s+|^\\[[^\\]]+\\]\\s+|\\b)(?P<parsed_level>DEBUG|INFO|NOTICE|WARNING|WARN|ERROR|ERR|CRITICAL)\\b"
+    }
+
+    stage.template {
+      source   = "parsed_level"
+      template = "{{ if eq (ToLower .Value) \"warn\" }}warning{{ else if eq (ToLower .Value) \"err\" }}error{{ else if eq (ToLower .Value) \"crit\" }}critical{{ else }}{{ ToLower .Value }}{{ end }}"
+    }
+
+    stage.labels {
+      values = {
+        level = "parsed_level",
+      }
+    }
+  }
+
+  forward_to = [loki.process.custom.receiver]
+}
+
+loki.process "journal" {
+  stage.match {
+    selector = sys.env("GLOBAL_DROP_SELECTOR")
+    action   = "drop"
+  }
+
+  forward_to = [grafana_cloud.stack.receivers.logs]
+}
