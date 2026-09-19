@@ -14,13 +14,7 @@ set_env ACCESS_TOKEN "$(bashio::config 'access_token')"
 set_env INSTANCE_NAME "$(bashio::config 'instance_name' 'homeassistant')"
 set_env SCRAPE_INTERVAL "$(bashio::config 'scrape_interval' '60s')"
 
-if bashio::config.has_value 'alloy_log_level'; then
-    set_env ALLOY_LOG_LEVEL "$(bashio::config 'alloy_log_level')"
-elif bashio::config.has_value 'log_level'; then
-    set_env ALLOY_LOG_LEVEL "$(bashio::config 'log_level')"
-else
-    set_env ALLOY_LOG_LEVEL "info"
-fi
+set_env ALLOY_LOG_LEVEL "$(bashio::config 'alloy_log_level' 'info')"
 
 MIN_LOG_LEVEL=$(bashio::config 'min_log_level' 'info')
 
