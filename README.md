@@ -14,3 +14,7 @@ the system logs (very brittle implementation - didn't get it to work :shrug:).
 
 Instead we use the same approach as [ha-addon-alloy](https://github.com/ecohash-co/ha-addon-alloy), which goes through journald
 to get all logs.
+
+## Testing
+
+See [e2e/README.md](e2e/README.md) for the local VM-based end-to-end test setup.
