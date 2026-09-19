@@ -15,6 +15,15 @@ the system logs (very brittle implementation - didn't get it to work :shrug:).
 Instead we use the same approach as [ha-addon-alloy](https://github.com/ecohash-co/ha-addon-alloy), which goes through journald
 to get all logs.
 
+> [!CAUTION]
+> A lot of this shit is vibe-coded. Please look at the code before you run this :yolo:
+
 ## Testing
 
 See [e2e/README.md](e2e/README.md) for the local VM-based end-to-end test setup.
+
+## TODO
+- [ci + prebuild images](https://developers.home-assistant.io/docs/apps/publishing/)
+- <https://github.com/home-assistant/apps-example>
+- local grafana instance in testenv
+- add logo lol
