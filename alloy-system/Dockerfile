@@ -1,5 +1,5 @@
-ARG BUILD_FROM
-FROM ${BUILD_FROM}
+ARG BUILD_ARCH
+FROM ghcr.io/home-assistant/${BUILD_ARCH}-base-debian:bookworm
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
