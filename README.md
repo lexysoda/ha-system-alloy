@@ -1,6 +1,8 @@
 # ha-system-alloy
 This plugin's goal is to export system level metrics and logs via alloy to grafana cloud.
 
+[![Add repository to my Home Assistant](https://my.home-assistant.io/badges/supervisor_add_addon_repository.svg)](https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https%3A%2F%2Fgithub.com%2Flexysoda%2Fha-system-alloy)
+
 [The official grafana plugin](https://github.com/grafana/home-assistant-addons) does something similar, but the metrics
 it provides are based on entities exposed through [homeassistant itself](https://www.home-assistant.io/integrations/prometheus/), which
 is more meant for exposing actual smart home entities, rather than host metrics (of which some can be exposed via the
